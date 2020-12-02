@@ -13,7 +13,7 @@ socketio = SocketIO(app)
 # Adding principal server Route which return Hello word 
 @app.route('/')
 def index():
-    return 'Hello Word!'
+    return render_template('index.html')
 
 
 # Running server
