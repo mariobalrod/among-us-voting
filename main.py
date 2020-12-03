@@ -15,6 +15,13 @@ socketio = SocketIO(app)
 def index():
     return render_template('index.html')
 
+# Add an socketio envent
+@socketio.on('message')
+def handleMessage(msg):
+    print('Message: ' + msg)
+
+    # Get msg and return with broadcast for all clients
+    send(msg, broadcast = True)
 
 # Running server
 if __name__ == '__main__':
