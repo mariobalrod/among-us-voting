@@ -24,9 +24,16 @@ socketio = SocketIO(app, cors_allowed_origins='*')
 def connection():
     print('Someone connected to websocket!')
 
+# Connection Event
+@socketio.on('clients')
+def handleNewClient(data):
+    print('New client: ', data)
+    emit('current_clients', data, broadcast = True)
+
 # Message Event
 @socketio.on('message')
 def handleMessage(msg):
+    print('Message: ', msg)
     # Get msg and return with broadcast for all clients
     send(msg, broadcast = True)
 
