@@ -49,7 +49,7 @@ const Color = styled.h4`
 `;
 
 
-const AmongCard = ({player, handleVote, hideVotation}) => {
+const AmongCard = ({currentPlayer, player, handleVote, hideVotation}) => {
   return (
     <Container>
       <Section>
@@ -59,7 +59,7 @@ const AmongCard = ({player, handleVote, hideVotation}) => {
 
       <Name>{player.votations}</Name>
 
-      {hideVotation && (
+      {hideVotation && currentPlayer.id !== player.id (
         <Votation>
           <Button onClick={() => handleVote(player.id)} variant="yes"></Button>
           <Button variant="no"></Button>

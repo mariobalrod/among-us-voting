@@ -27,6 +27,7 @@ const Content = styled.div`
 `;
 
 function App() {
+  const [currentePlayer, setCurrentPlayer] = useState();
   const [hideVotation, setHideVotation] = useState(true);
   const [players, setPlayers] = useState([]);
   const [colors, setColors] = useState([
@@ -89,22 +90,26 @@ function App() {
       if (!nombre || !color) {
         alert("All required!");
       } else {
+        const newCurrentPlayer = {
+          username: nombre,
+          color: color,
+          votations: 0,
+          id: v4(),
+        }
+
+        setCurrentPlayer(newCurrentPlayer);
+
         socket.emit("color", color);
 
         socket.emit(
           "players",
-          JSON.stringify({
-            username: nombre,
-            color: color,
-            votations: 0,
-            id: v4(),
-          })
+          JSON.stringify(newCurrentPlayer)
         );
 
         setHideForm(false);
       }
     },
-    [setHideForm]
+    [setHideForm, setCurrentPlayer]
   );
 
   return (
@@ -118,6 +123,7 @@ function App() {
                 {players.map((player) => (
                   <AmongCard
                     key={player.id}
+                    currentePlayer={currentePlayer}
                     player={player}
                     handleVote={handleVote}
                     hideVotation={hideVotation}
