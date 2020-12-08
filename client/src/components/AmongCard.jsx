@@ -61,7 +61,7 @@ const AmongCard = ({currentPlayer, player, handleVote, hideVotation}) => {
 
       {hideVotation && currentPlayer.id !== player.id && (
         <Votation>
-          <Button onClick={() => handleVote(player.id)} variant="yes"></Button>
+          <Button onClick={() => handleVote(player)} variant="yes"></Button>
           <Button variant="no"></Button>
         </Votation>
       )}

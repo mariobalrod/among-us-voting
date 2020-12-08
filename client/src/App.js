@@ -46,16 +46,14 @@ function App() {
   }
 
   useEffect(() => {
-    socket.on("current_vote", (data) => {
-      console.log(data)
-      const newPlayersState = players.map(player => {
-        if (player.id === data) {
-          player.votations = player.votations + 1;
-
-          return player;
+    socket.on("current_vote", (res) => {
+      console.log(res);
+      const newPlayersState = players.map((player) => {
+        if (player.id === res.id) {
+          return res;
         }
         return player;
-      })
+      });
 
       setPlayers(newPlayersState);
     });
@@ -78,8 +76,10 @@ function App() {
   }, [setHideVotation]);
 
   const handleVote = useCallback(
-    (id) => {
-      socket.emit('vote', id);
+    (playerVoted) => {
+      playerVoted.votations = playerVoted.votations + 1;
+
+      socket.emit("vote", playerVoted);
       handleHideVotation();
     },
     [handleHideVotation]
@@ -95,16 +95,13 @@ function App() {
           color: color,
           votations: 0,
           id: v4(),
-        }
+        };
 
         setCurrentPlayer(newCurrentPlayer);
 
         socket.emit("color", color);
 
-        socket.emit(
-          "players",
-          JSON.stringify(newCurrentPlayer)
-        );
+        socket.emit("players", JSON.stringify(newCurrentPlayer));
 
         setHideForm(false);
       }
@@ -114,25 +111,26 @@ function App() {
 
   return (
     <div className="App">
-      <h1 style={{textAlign: 'center'}}>Socketio, Flask and React Chat</h1>
-      <>
+      <h1 style={{ textAlign: "center" }}>Socketio, Flask and React Chat</h1>
+      {currentPlayer && <h3 style={{ textAlign: "center" }}>You are {currentPlayer.username}</h3>}
+      <h3>
         {hideForm && <Form colors={colors} handleLogin={handleLogin} />}
         {!hideForm && (
-            <Container>
-              <Content>
-                {players.map((player) => (
-                  <AmongCard
-                    key={player.id}
-                    currentPlayer={currentPlayer}
-                    player={player}
-                    handleVote={handleVote}
-                    hideVotation={hideVotation}
-                  />
-                ))}
-              </Content>
-            </Container>
-          )}
-      </>
+          <Container>
+            <Content>
+              {players.map((player) => (
+                <AmongCard
+                  key={player.id}
+                  currentPlayer={currentPlayer}
+                  player={player}
+                  handleVote={handleVote}
+                  hideVotation={hideVotation}
+                />
+              ))}
+            </Content>
+          </Container>
+        )}
+      </h3>
     </div>
   );
 }
