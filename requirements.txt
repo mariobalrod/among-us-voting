@@ -1,5 +1,6 @@
 click==7.1.2
 Flask==1.1.2
+Flask-Cors==3.0.9
 Flask-SocketIO==4.3.2
 gevent==20.9.0
 gevent-websocket==0.10.1
