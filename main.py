@@ -2,41 +2,50 @@ from flask import Flask
 from flask_socketio import SocketIO, send, emit
 from flask_cors import CORS
 
-from gevent.pywsgi import WSGIServer
-from geventwebsocket.handler import WebSocketHandler
+""" from gevent.pywsgi import WSGIServer
+from geventwebsocket.handler import WebSocketHandler """
 
 # Flask Server Initialization 
 app = Flask(__name__)
 
-# Secret Word app configuration for Socketio
+# Flask app config
 app.config['SECRET_KEY'] = 'secret'
+app.config['DEBUG'] = True
+app.config['CORS_HEADERS'] = 'Content-Type'
 
-# Connection Socket -- Flask
-socketio = SocketIO(app)
+# Adding CORS to flask App
+CORS(app, resources={r"/*": {"origins": "*"}})
 
-# Adding cors to the app
-CORS(app)
+# Connection Socket -- Flask // and adding cors origins
+socketio = SocketIO(app, cors_allowed_origins='*')
 
-# Adding principal server Route which return Hello word 
-@app.route('/')
-def index():
-    return 'Hello world!'
+# Connection Event
+@socketio.on('connect')
+def connection():
+    print('Someone connected to websocket!')
 
-# Add an socketio envent
+# Message Event
 @socketio.on('message')
 def handleMessage(msg):
-    print('Message: ' + msg)
-
     # Get msg and return with broadcast for all clients
     send(msg, broadcast = True)
 
-@socketio.on_error_default  # handles all namespaces without an explicit error handler
+# Default Error Event
+@socketio.on_error_default  
 def default_error_handler(e):
-    print('An error occurred:')
+    print('An error occurred: ')
+    print(e)
+
+# Error Event
+@socketio.on_error  
+def error_handler(e):
+    print('An error occurred: ')
     print(e)
 
 # Running server
 if __name__ == '__main__':
-    # socketio.run(app)
+    socketio.run(app)
+    """ 
     http_server = WSGIServer(('',5000), app, handler_class=WebSocketHandler)
-    http_server.serve_forever()
+    http_server.serve_forever() 
+    """
