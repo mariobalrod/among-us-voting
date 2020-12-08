@@ -27,7 +27,7 @@ const Content = styled.div`
 `;
 
 function App() {
-  const [currentePlayer, setCurrentPlayer] = useState();
+  const [currentPlayer, setCurrentPlayer] = useState();
   const [hideVotation, setHideVotation] = useState(true);
   const [players, setPlayers] = useState([]);
   const [colors, setColors] = useState([
@@ -114,7 +114,7 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Socketio, Flask and React Chat</h1>
+      <h1 style={{textAlign: 'center'}}>Socketio, Flask and React Chat</h1>
       <>
         {hideForm && <Form colors={colors} handleLogin={handleLogin} />}
         {!hideForm && (
@@ -123,7 +123,7 @@ function App() {
                 {players.map((player) => (
                   <AmongCard
                     key={player.id}
-                    currentePlayer={currentePlayer}
+                    currentPlayer={currentPlayer}
                     player={player}
                     handleVote={handleVote}
                     hideVotation={hideVotation}

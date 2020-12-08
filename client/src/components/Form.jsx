@@ -1,8 +1,8 @@
 import React, { memo, useCallback, useState } from 'react';
 
 const DefaultForm = ({ colors, handleLogin}) => {
-  const [color, setColor] = useState();
-  const [nombre, setNombre] = useState();
+  const [color, setColor] = useState('');
+  const [nombre, setNombre] = useState('');
 
   const handleColor = useCallback((e) => {
     e.preventDefault();
