@@ -19,23 +19,30 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 # Connection Socket -- Flask // and adding cors origins
 socketio = SocketIO(app, cors_allowed_origins='*')
 
-# Connection Event
+# Connections Event
 @socketio.on('connect')
 def connection():
-    print('Someone connected to websocket!')
+    print('New Client connected!')
 
-# Connection Event
-@socketio.on('clients')
+@socketio.on('disconnect')
+def test_disconnect():
+    print('Client disconnected')
+
+# Client Event
+@socketio.on('players')
 def handleNewClient(data):
-    print('New client: ', data)
-    emit('current_clients', data, broadcast = True)
+    print('New player: ', data)
+    emit('current_players', data, broadcast = True)
 
-# Message Event
-@socketio.on('message')
-def handleMessage(msg):
-    print('Message: ', msg)
-    # Get msg and return with broadcast for all clients
-    send(msg, broadcast = True)
+# Vote Event
+@socketio.on('vote')
+def handleVote(data):
+    emit('current_vote', data, broadcast = True)
+
+# Colors Event
+@socketio.on('color')
+def handleColor(color):
+    emit('current_color', color, broadcast = True)
 
 # Default Error Event
 @socketio.on_error_default  
