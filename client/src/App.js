@@ -1,14 +1,34 @@
 import { useEffect, useState, useCallback } from 'react';
 import { v4 } from 'uuid';
 import io from 'socket.io-client';
+import styled from 'styled-components';
 
 import Form from './components/Form'; 
+import AmongCard from './components/AmongCard'; 
 
 const ENDPOINT = 'http://localhost:5000';
 const socket = io.connect(ENDPOINT);
 
+const Container = styled.div`
+  margin-top: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+`;
+
+const Content = styled.div`
+  margin-top: 50px;
+  width: 1500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+`;
+
 function App() {
-  const [clients, setClients] = useState([]);
+  const [hideVotation, setHideVotation] = useState(true);
+  const [players, setPlayers] = useState([]);
   const [colors, setColors] = useState([
     "red",
     "green",
@@ -25,6 +45,20 @@ function App() {
   }
 
   useEffect(() => {
+    socket.on("current_vote", (data) => {
+      console.log(data)
+      const newPlayersState = players.map(player => {
+        if (player.id === data) {
+          player.votations = player.votations + 1;
+
+          return player;
+        }
+        return player;
+      })
+
+      setPlayers(newPlayersState);
+    });
+
     socket.on("current_color", (data) => {
       if (colors.includes(data)) {
         const newColors = removeItemFromArr(colors, data);
@@ -33,10 +67,22 @@ function App() {
       }
     });
 
-    socket.on("current_clients", (data) => {
-      setClients([...clients, JSON.parse(data)]);
+    socket.on("current_players", (data) => {
+      setPlayers([...players, JSON.parse(data)]);
     });
-  }, [clients, setClients, colors, setColors]);
+  }, [players, setPlayers, colors, setColors]);
+
+  const handleHideVotation = useCallback(() => {
+    setHideVotation(false);
+  }, [setHideVotation]);
+
+  const handleVote = useCallback(
+    (id) => {
+      socket.emit('vote', id);
+      handleHideVotation();
+    },
+    [handleHideVotation]
+  );
 
   const handleLogin = useCallback(
     (nombre, color) => {
@@ -46,7 +92,7 @@ function App() {
         socket.emit("color", color);
 
         socket.emit(
-          "clients",
+          "players",
           JSON.stringify({
             username: nombre,
             color: color,
@@ -66,10 +112,20 @@ function App() {
       <h1>Socketio, Flask and React Chat</h1>
       <>
         {hideForm && <Form colors={colors} handleLogin={handleLogin} />}
-        {!hideForm &&
-          clients.map((client) => (
-            <p key={client.id}>{JSON.stringify(client)}</p>
-          ))}
+        {!hideForm && (
+            <Container>
+              <Content>
+                {players.map((player) => (
+                  <AmongCard
+                    key={player.id}
+                    player={player}
+                    handleVote={handleVote}
+                    hideVotation={hideVotation}
+                  />
+                ))}
+              </Content>
+            </Container>
+          )}
       </>
     </div>
   );
